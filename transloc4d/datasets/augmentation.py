@@ -18,7 +18,7 @@ class Normalize:
             data[:, :, self.dim :] = (data[:, :, self.dim :] - self.mean) / self.std
         elif len(data.shape)==2 and data.shape[-1]==5:
             data[:, self.dim :] = (data[:, self.dim :] - self.mean.squeeze(0)) / self.std.squeeze(0)
-        # data[:,4:] = data[:,4:]/self.mean[:,1]
+        # data_prepocess[:,4:] = data_prepocess[:,4:]/self.mean[:,1]
         return data
     
 class TrainSetTransform:
@@ -34,7 +34,7 @@ class TrainSetTransform:
 
     def __call__(self, e):
         if self.transform is not None:
-            e = self.transform(e)
+            e[:, :, :3] = self.transform(e[:, :, :3])
         return e
 
 class ValSetTransform:
@@ -50,7 +50,7 @@ class ValSetTransform:
 
     def __call__(self, e):
         if self.transform is not None:
-            e = self.transform(e)
+            e[:, :3] = self.transform(e[:, :3])
         return e
 
 class RandomFlip:
@@ -105,10 +105,10 @@ class RandomRotation:
             axis = np.random.rand(3) - 0.5
         R = self._M(axis, (np.pi * self.max_theta / 180.) * 2. * (np.random.rand(1) - 0.5))
         if self.max_theta2 is None:
-            coords[:, :, :3] = coords[:, :, :3] @ R
+            coords[:, :3] = coords[:, :3] @ R
         else:
             R_n = self._M(np.random.rand(3) - 0.5, (np.pi * self.max_theta2 / 180.) * 2. * (np.random.rand(1) - 0.5))
-            coords[:, :, :3] = coords[:, :, :3] @ R @ R_n
+            coords[:, :3] = coords[:, :3] @ R @ R_n
 
         return coords
 

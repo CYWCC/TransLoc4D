@@ -1,0 +1,13 @@
+--config
+../config/train/ntu-rsvi.txt
+--model_config
+../config/model/transloc4d.txt
+--gpu_id 0
+
+--database_pickle /media/cyw/KESU/datasets/snail_radar/processed_snail_radar/ars548/evaluation_database_valid.pickle
+--query_pickle /media/cyw/KESU/datasets/snail_radar/processed_snail_radar/ars548/evaluation_query_valid_25m_30.pickle
+--model_config ../config/model/transloc4d.txt
+--weights 20241214_2253_transloc4d_epoch_300.pth
+
+
+

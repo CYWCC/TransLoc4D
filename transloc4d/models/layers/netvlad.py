@@ -10,7 +10,7 @@ import math
 
 """
 NOTE: The toolbox can only pool lists of features of the same length. It was specifically optimized to efficiently
-do so. One way to handle multiple lists of features of variable length is to create, via a data augmentation
+do so. One way to handle multiple lists of features of variable length is to create, via a data_prepocess augmentation
 technique, a tensor of shape: 'batch_size'x'max_samples'x'feature_size'. Where 'max_samples' would be the maximum
 number of feature per list. Then for each list, you would fill the tensor with 0 values.
 """

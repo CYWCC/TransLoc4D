@@ -13,6 +13,8 @@ import numpy as np
 import tqdm
 import pathlib
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from transloc4d import evaluate_4drad_dataset, save_recall_results
 from transloc4d.misc.utils import TrainingParams
 from transloc4d.datasets import WholeDataset, make_dataloaders
@@ -171,6 +173,8 @@ def multistaged_training_step(global_iter, model, phase, device, optimizer, loss
 
     torch.cuda.empty_cache()  # Prevent excessive GPU memory consumption by SparseTensors
 
+    print(f"stats: {stats}")
+
     return stats
         
 def mkdir_if_missing(dir_path):
@@ -187,7 +191,8 @@ def do_train(params: TrainingParams, model_name, weights_folder, resume_filename
     else:
         device = "cpu"
 
-    val_set = WholeDataset(os.path.join(params.dataset_folder, params.test_database), os.path.join(params.dataset_folder, params.test_query))
+    val_set = WholeDataset(params.dataset_folder, os.path.join(params.dataset_folder, params.test_database), os.path.join(params.dataset_folder, params.test_query))
+    # val_set =WholeDataset(params.test_database,params.test_query)
     
     test_database_name = params.test_database.split('.')[0]
     test_query_name = params.test_query.split('.')[0]
@@ -270,6 +275,7 @@ def do_train(params: TrainingParams, model_name, weights_folder, resume_filename
         "best_r@1": 0,
         "metrics": []
     }
+    # recall_metrics = evaluate_4drad_dataset(model, device, val_set, params)
     for epoch in tqdm.tqdm(range(start_epoch + 1, params.epochs + 1)):
         metrics = {'epoch': epoch, 'train': {}, 'val': {}}      # Metrics for wandb reporting
         current_val_recall = 0
@@ -340,7 +346,8 @@ def do_train(params: TrainingParams, model_name, weights_folder, resume_filename
         if scheduler is not None:
             scheduler.step()
 
-        if epoch >100 or epoch % 50 == 0 or epoch==125:
+        # if epoch >100 or epoch % 50 == 0 or epoch==125:
+        if  epoch == 1 or epoch % 50 == 0 or epoch == 125:
             model.eval()
             recall_metrics = evaluate_4drad_dataset(model, device, val_set, params)
             
@@ -413,7 +420,7 @@ if __name__ == '__main__':
     parser.add_argument('--debug', dest='debug', action='store_true')
     parser.add_argument('--resume', type=str, default=None, help='resume')  # add resume
     parser.set_defaults(debug=False)
-    parser.add_argument("--gpu_id", type=int, default=2, help="GPU ID to use")
+    parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to use")
 
     args = parser.parse_args()
     print('Training config path: {}'.format(args.config))

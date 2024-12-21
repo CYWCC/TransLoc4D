@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate model on a dataset.")
     parser.add_argument("--database_pickle", required=True, help="Path to the database pickle file")
     parser.add_argument("--query_pickle", required=True, help="Path to the query pickle file")
-    parser.add_argument("--config", default = "config/training/ntu-rsvi.txt", help="Path to the configuration file")
+    parser.add_argument("--config", default = "../config/train/ntu-rsvi.txt", help="Path to the configuration file")
     parser.add_argument("--model_config", default = None, help="Path to the model-specific configuration file")
     parser.add_argument("--weights", required=True, help="Path to the trained model weights")
     parser.add_argument("--gpu_id", type=int, default=0, help="GPU ID to use")
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     database_sets = load_pickle(args.database_pickle)
     query_sets = load_pickle(args.query_pickle)
-    test_set = WholeDataset(args.database_pickle, args.query_pickle)
+    test_set = WholeDataset(params.dataset_folder, args.database_pickle, args.query_pickle)
 
     # Run the evaluation
     recall_metrics = evaluate_4drad_dataset(model, device, test_set, params)

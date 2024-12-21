@@ -21,7 +21,7 @@ from misc import TrainingParams
 def make_datasets(params: TrainingParams, validation: bool = True):
     # Create training and validation datasets
     datasets = {}
-    train_set_transform = TrainSetTransform(params.set_aug_mode)  # data augumentation  rotation flip
+    train_set_transform = TrainSetTransform(params.set_aug_mode)  # data_prepocess augumentation  rotation flip
     val_set_transform = ValSetTransform(params.set_aug_mode)  
     train_transform = PNVTrainTransform(params.aug_mode) 
 
@@ -43,6 +43,13 @@ def make_collate_fn(dataset: TrainingDataset, quantizer, batch_split_size=None, 
 
         if dataset.set_transform is not None:
             clouds = dataset.set_transform(torch.stack(clouds))
+
+            # lens = [len(cloud) for cloud in clouds]
+            # clouds = torch.cat(clouds, dim=0)
+            # xyz = clouds[:, :3]
+            # xyz = dataset.set_transform(xyz)
+            # clouds[:, :3] = xyz
+            # clouds = clouds.split(lens)
 
         if isinstance(clouds, list):  # val: list to tensor
             clouds = torch.stack(clouds)
@@ -69,10 +76,11 @@ def make_collate_fn(dataset: TrainingDataset, quantizer, batch_split_size=None, 
         if batch_split_size is None or batch_split_size == 0:
             coords = ME.utils.batched_coordinates(coords)
             if input_representation == "R":
-                feats = torch.ones((c.shape[0], 1), dtype=torch.float32)
+                feats = torch.ones((coords.shape[0], 1), dtype=torch.float32)
             else:
                 feats = torch.cat(feats, 0)
-            batch = {'coords': coords, 'features': feats, 'batch': clouds[:,:,:3]}
+            # batch = {'coords': coords, 'features': feats, 'batch': clouds[:,:,:3]}
+            batch = {'coords': coords, 'features': feats}
 
         else:
             # Split the batch into chunks
@@ -86,8 +94,10 @@ def make_collate_fn(dataset: TrainingDataset, quantizer, batch_split_size=None, 
                 else:
                     f = torch.cat(feats[i : i + batch_split_size], 0)
                 batch_temp = clouds[i:i + batch_split_size]
-                minibatch = {'coords': c, 'features': f, 'batch': batch_temp[:,:,:3]}
-                # minibatch = {'coords': c, 'features': f}
+                # batch_temp =  torch.cat(batch_temp, 0)[:,:3]
+                # minibatch = {'coords': c, 'features': f, 'batch': batch_temp[:,:,:3]}
+                # minibatch = {'coords': c, 'features': f, 'batch': batch_temp}
+                minibatch = {'coords': c, 'features': f}
                 batch.append(minibatch)
 
         return batch, positives_mask, negatives_mask

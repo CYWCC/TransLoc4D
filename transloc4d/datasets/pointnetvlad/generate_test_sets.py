@@ -8,7 +8,7 @@ from sklearn.neighbors import KDTree
 import pickle
 import argparse
 
-# For training and test data splits
+# For training and test data_prepocess splits
 X_WIDTH = 150
 Y_WIDTH = 150
 

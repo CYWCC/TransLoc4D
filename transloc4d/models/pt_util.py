@@ -456,7 +456,7 @@ def variable_size_collate(pad_val=0, use_shared_memory=True):
     }
 
     def wrapped(batch):
-        "Puts each data field into a tensor with outer dimension batch size"
+        "Puts each data_prepocess field into a tensor with outer dimension batch size"
 
         error_msg = "batch must contain tensors, numbers, dicts or lists; found {}"
         elem_type = type(batch[0])
@@ -520,9 +520,9 @@ class TrainValSplitter():
         numel : int
             Number of elements in the entire training dataset
         percent_train : float
-            Percentage of data in the training split
+            Percentage of data_prepocess in the training split
         shuffled : bool
-            Whether or not shuffle which data goes to which split
+            Whether or not shuffle which data_prepocess goes to which split
     """
 
     def __init__(
@@ -554,7 +554,7 @@ class CrossValSplitter():
         k_folds : int
             Number of folds
         shuffled : bool
-            Whether or not to shuffle which data goes in which fold
+            Whether or not to shuffle which data_prepocess goes in which fold
     """
 
     def __init__(self, *, numel: int, k_folds: int, shuffled: bool = False):
@@ -565,8 +565,8 @@ class CrossValSplitter():
         self.folds = np.array(np.array_split(inidicies, k_folds), dtype=object)
         self.current_v_ind = -1
 
-        self.val = torch.utils.data.sampler.SubsetRandomSampler(self.folds[0])
-        self.train = torch.utils.data.sampler.SubsetRandomSampler(
+        self.val = torch.utils.data_prepocess.sampler.SubsetRandomSampler(self.folds[0])
+        self.train = torch.utils.data_prepocess.sampler.SubsetRandomSampler(
             np.concatenate(self.folds[1:], axis=0)
         )
 
@@ -769,10 +769,10 @@ class Trainer(object):
             Epoch to start at
         n_epochs : int
             Number of epochs to train for
-        test_loader : torch.utils.data.DataLoader
+        test_loader : torch.utils.data_prepocess.DataLoader
             DataLoader of the test_data
-        train_loader : torch.utils.data.DataLoader
-            DataLoader of training data
+        train_loader : torch.utils.data_prepocess.DataLoader
+            DataLoader of training data_prepocess
         best_loss : float
             Testing loss of the best model
         """

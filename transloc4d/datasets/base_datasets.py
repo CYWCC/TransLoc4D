@@ -87,7 +87,7 @@ class EvaluationSet:
     def save(self, pickle_filepath: str):
         # Pickle the evaluation set
 
-        # Convert data to tuples and save as tuples
+        # Convert data_prepocess to tuples and save as tuples
         query_l = []
         for e in self.query_set:
             query_l.append(e.to_tuple())

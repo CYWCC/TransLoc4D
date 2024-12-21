@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     print(len(df_train['file']))
 
-    ##Combine with Oxford data
+    ##Combine with Oxford data_prepocess
     runs_folder = "oxford/"
     filename = "pointcloud_locations_20m_10overlap.csv"
     pointcloud_fols = "/pointcloud_20m_10overlap/"

@@ -245,7 +245,7 @@ class TransVLAD3d(nn.Module):
         vlad = F.normalize(vlad, p=2, dim=1)
         return vlad
 
-def find_initcache(pool_layer, dataPath='../data', pooling='transvlad3d', num_clusters=64):
+def find_initcache(pool_layer, dataPath='../data_prepocess', pooling='transvlad3d', num_clusters=64):
     suffix = '.hdf5'
     backbone = 'MinklocFPN'
     if pooling.lower() in ['appsvr', 'appsvrv2', 'isapvlad', 'isapvladv2', 'cahir', 'patchcahir']:

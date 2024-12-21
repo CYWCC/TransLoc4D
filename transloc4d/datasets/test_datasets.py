@@ -13,6 +13,7 @@ from .pc_loader import Rad4DPointCloudLoader
 class WholeDataset(data.Dataset):
     def __init__(
         self,
+        dataset_folder,
         database_pickle,
         query_pickle,
         input_transform=ValSetTransform(aug_mode=1),
@@ -22,6 +23,7 @@ class WholeDataset(data.Dataset):
         mode="test",
     ):
         super().__init__()
+        self.dataset_folder = dataset_folder
         self.split = split
         self.pc_loader = Rad4DPointCloudLoader()
         self.database = self.load_pickle(database_pickle)
@@ -52,8 +54,9 @@ class WholeDataset(data.Dataset):
 
             # Extract timestamp from the filename
             scan_filename = df_query[anchor_ndx]["file"]
-            assert os.path.isfile(scan_filename), "point cloud file {} is found".format(
-                scan_filename
+            scan_file = os.path.join(self.dataset_folder, scan_filename)
+            assert os.path.isfile(scan_file), "point cloud file {} is found".format(
+                scan_file
             )
 
             # Sort ascending order
@@ -83,6 +86,7 @@ class WholeDataset(data.Dataset):
     def __getitem__(self, ndx):
         # Load point cloud and apply transform
         file_pathname = self.wholedataset_pc_file[ndx]
+        file_pathname = os.path.join(self.dataset_folder, file_pathname)
         query_pc = self.pc_loader(file_pathname)
         query_pc = torch.tensor(query_pc, dtype=torch.float)
         if self.input_transform is not None:
@@ -169,8 +173,8 @@ def test_collate_fn(
                     f = torch.ones((c.shape[0], 1), dtype=torch.float32)
                 else:
                     f = torch.cat(feats[i: i + batch_split_size], 0)
-                minibatch = {"coords": c, "features": f,
-                             "batch": torch.stack(temp_org)}
+                # minibatch = {"coords": c, "features": f, "batch": torch.stack(temp_org)}
+                minibatch = {"coords": c, "features": f}
                 batch.append(minibatch)
 
         return batch

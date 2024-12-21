@@ -142,7 +142,7 @@ class Interpolate(nn.Module):
             coords[i] = xyz_t_single[0].float()
 
         # feat0.features =torch.cat(features,0)
-        # feat0.features.data =torch.cat(features,0)
+        # feat0.features.data_prepocess =torch.cat(features,0)
 
         # indices_sort = np.argsort(self.array2vector(xyz_t.coordinates.cpu(),
         # xyz_t.coordinates.cpu().max()+1))

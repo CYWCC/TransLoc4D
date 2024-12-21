@@ -34,7 +34,7 @@ class MinkLoc(torch.nn.Module):
         self.FTU = Interpolate(64, 256) if add_FTU else None
 
     def forward(self, batch):
-        x = ME.SparseTensor(batch["features"], coordinates=batch["coords"])
+        x = ME.SparseTensor(batch['features'], coordinates=batch['coords'])
         x, x_conv0 = self.backbone(x)
         assert x.shape[1] == self.pooling.in_dim, (
             f"Backbone output tensor has: {x.shape[1]} channels. "

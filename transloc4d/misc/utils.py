@@ -39,7 +39,7 @@ class ModelParams:
         elif "cartesian" in self.coordinates:
             # Single quantization step for cartesian coordinates
             self.quantization_step = params.getfloat("quantization_step")
-            self.quantizer = CartesianQuantizer(quant_step=self.quantization_step)
+            self.quantizer = CartesianQuantizer(quant_step=self.quantization_step, normalize=True)
         else:
             raise NotImplementedError(f"Unsupported coordinates: {self.coordinates}")
 

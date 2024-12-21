@@ -57,5 +57,5 @@ class Rad4DPointCloudLoader(PointCloudLoader):
             pc = np.fromfile(file_path, dtype=np.float64)
             pc = np.float32(pc)
             # coords are within -1..1 range in each dimension
-            pc = np.reshape(pc, (pc.shape[0] // 3, 3))
+            pc = np.reshape(pc, (pc.shape[0] //5, 5))
             return pc

@@ -127,10 +127,10 @@ class MinkFPN(ResNetBase):
         # *** BOTTOM-UP PASS ***
         # First bottom-up convolution is special (with bigger kernel)
         feature_maps = []
-        # x.features.data=x.features[:,1:]
+        # x.features.data_prepocess=x.features[:,1:]
         # radom dropout
-        # x.features.data = self.random_dropout(x.features.data,0.5,0)
-        # x.features.data[:,:1] = self.dropout(x.features.data[:,:1])
+        # x.features.data_prepocess = self.random_dropout(x.features.data_prepocess,0.5,0)
+        # x.features.data_prepocess[:,:1] = self.dropout(x.features.data_prepocess[:,:1])
         # x is in shape [N,2]
         x = self.conv0(x)  # [N,64]
         x = self.bn0(x)
