@@ -74,9 +74,10 @@ def construct_query_and_database_sets(base_path, data_type, seqs, positive_dist,
                     query_sets.append(query)
 
     # Save output
-    os.makedirs(cfgs.data_path, exist_ok=True)
-    database_file = os.path.join(cfgs.data_path, f"evaluation_database_{data_type}_iaf.pickle")
-    query_file = os.path.join(cfgs.data_path, f"evaluation_query_{data_type}_{positive_dist}m{'_' + str(yaw_threshold) if use_yaw else ''}_iaf.pickle")
+    save_folder = os.path.join(cfgs.data_path, 'radar_split/')
+    os.makedirs(save_folder, exist_ok=True)
+    database_file = os.path.join(save_folder, f"evaluation_database_{data_type}.pickle")
+    query_file = os.path.join(save_folder, f"evaluation_query_{data_type}_{positive_dist}m{'_' + str(yaw_threshold) if use_yaw else ''}.pickle")
     output_to_file(database_sets, database_file)
     output_to_file(query_sets, query_file)
 
@@ -97,16 +98,16 @@ if __name__ == '__main__':
 
     if 'valid' in cfgs.data_type:
         if "ars548" in cfgs.data_path:
-            seqs = ['iaf'] #, 'if', 'sl'
+            seqs = ['if', 'iaf'] #,  'sl'
         elif "oculii" in cfgs.data_path:
-            seqs = ['iaf']
+            seqs = ['if', 'iaf']
         else:
             raise Exception('Loading error!')
     elif 'test' in cfgs.data_type:
         if "ars548" in cfgs.data_path:
-            seqs = ['']
-        elif "oculli" in cfgs.data_path:
-            seqs = ['']
+            seqs = ['bc', 'ss', 'st', 'sl', 'if', 'iaf', 'iaef', '81r']
+        elif "oculii" in cfgs.data_path:
+            seqs = ['bc','ss', 'st', 'sl', 'if', 'iaf', 'iaef', '81r']
         else:
             raise Exception('Loading error!')
 
