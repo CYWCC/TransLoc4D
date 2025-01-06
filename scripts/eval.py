@@ -48,15 +48,19 @@ if __name__ == "__main__":
     params = TrainingParams(args.config, args.model_config, debug=False)  # Adjust parameters as necessary
     model = get_model(params, device, args.weights)
 
-    database_sets = load_pickle(args.database_pickle)
-    query_sets = load_pickle(args.query_pickle)
     test_set = WholeDataset(params.dataset_folder, args.database_pickle, args.query_pickle)
 
     # Run the evaluation
     recall_metrics = evaluate_4drad_dataset(model, device, test_set, params)
 
+    for scene, scene_recall in recall_metrics.items():
+        print(f"Scene: {scene}:")
+        for n in [1, 5, 10]:
+            recall_at_n = scene_recall['recall_at_n'].get(n, 0.0)  # 获取 recall@N，默认值为 0.0
+            print(f"Recall@{n}: {recall_at_n:.4f}")
 
-    print(f"Recall@1: {recall_metrics[1]:.4f}, Recall@5: {recall_metrics[5]:.4f}, Recall@10: {recall_metrics[10]:.4f}")
+        print(f"Top 1% Recall: {scene_recall['recall_at_1_percent']:.4f}")
+        print("\n")
 
     model_name = os.path.basename(args.weights).split('.')[0]
     result_dir = os.path.dirname(args.weights)

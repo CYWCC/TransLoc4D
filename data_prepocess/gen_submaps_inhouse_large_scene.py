@@ -4,7 +4,7 @@ import rosbag
 import argparse
 from tqdm import tqdm
 import sensor_msgs.point_cloud2 as pc2
-from tools import interpolation, load_poses, standardization, random_down_sample, standardization_pv, norm_rcs
+from tools import interpolation, load_poses, standardization, random_down_sample, standardization_pv
 from scipy.spatial.transform import Rotation
 import open3d as o3d
 import copy
@@ -144,10 +144,11 @@ def main(cfgs):
                         Rc_T_Rj = np.matmul(Rc_T_U, U_T_Rj)
                         temp_pc_in_center = np.matmul(Rc_T_Rj, temp_pc.T).T
 
-                        if cfgs.use_rcs:
-                            temp_pc_in_center[:, 3] = rcs_list[j]
                         if cfgs.use_doppler:
-                            temp_pc_in_center = np.column_stack((temp_pc_in_center, doppler_list[j]))
+                            temp_pc_in_center[:, 3] =  doppler_list[j]
+
+                        if cfgs.use_rcs:
+                            temp_pc_in_center = np.column_stack((temp_pc_in_center, rcs_list[j]))
 
                         submap_pc = np.concatenate((submap_pc, temp_pc_in_center),
                                                    axis=0) if submap_pc.size else temp_pc_in_center
@@ -157,15 +158,6 @@ def main(cfgs):
                     mask &= submap_pc[:, 2] >= -10
                     mask &= submap_pc[:, 0] >= -10
                     submap_pc = submap_pc[mask]
-
-                    # submap_pcd = o3d.geometry.PointCloud()
-                    # submap_pcd.points = o3d.utility.Vector3dVector(submap_pc[:, :3])
-                    # clean_submap, ind = submap_pcd.remove_statistical_outlier(nb_neighbors=16, std_ratio=2.0)
-                    # submap_pc = submap_pc[ind, :]
-
-                    # Normalization if needed
-                    if cfgs.norm:
-                        submap_pc = standardization_pv(submap_pc) if cfgs.use_rcs else standardization(submap_pc[:, :3])
 
                     # Downsampling if needed
                     if cfgs.downsample:
@@ -216,7 +208,6 @@ if __name__ == "__main__":
     parser.add_argument('--radar_topic', type=str, default='/ars548', help='Radar topic in rosbag:/radar_enhanced_pcl2 ')
     parser.add_argument('--frame_winsize', type=int, default=7, help='Window size for submap')
     parser.add_argument('--gap_size', type=int, default=5, help='Gap size between submaps')
-    parser.add_argument('--norm', type=bool, default=False, help='Test sequences in the dataset')
     parser.add_argument('--downsample', type=bool, default=True, help='Downsample the submap')
     parser.add_argument('--target_points', type=int, default=1024, help='Target points in saved submaps')
     parser.add_argument('--max_range', type=float, default=250, help='Maximum range for the points')

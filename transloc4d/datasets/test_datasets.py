@@ -33,6 +33,7 @@ class WholeDataset(data.Dataset):
         self.wholedataset_pc_file = self.queries_pc_file + self.database_pc_file
         self.len_q = len(self.queries_pc_file)
         self.len_db = len(self.database_pc_file)
+
         self.input_transform = input_transform
         # pc_loader must be set in the inheriting class
         self.set_transform = set_transform
@@ -43,40 +44,47 @@ class WholeDataset(data.Dataset):
             return pickle.load(f)
 
     def construct_quries(self, df_query):
-        self.queries = {}
         self.queries_id = []
         self.queries_pc_file = []
         self.queries_nonnegatives = []
-        for anchor_ndx in range(len(df_query)):
-            non_negatives = df_query[anchor_ndx]["positives"]
-            if len(non_negatives) == 0:
-                continue
+        self.query_lengths = {}
+        for scene in df_query.keys():
+            count = 0
+            for anchor_ndx in range(len(df_query[scene])):
+                non_negatives = df_query[scene][anchor_ndx]["positives"]
+                if len(non_negatives) == 0:
+                    continue
+                count += 1
 
-            # Extract timestamp from the filename
-            scan_filename = df_query[anchor_ndx]["file"]
-            scan_file = os.path.join(self.dataset_folder, scan_filename)
-            assert os.path.isfile(scan_file), "point cloud file {} is found".format(
-                scan_file
-            )
+                # Extract timestamp from the filename
+                scan_filename = df_query[scene][anchor_ndx]["file"]
+                scan_file = os.path.join(self.dataset_folder, scan_filename)
+                assert os.path.isfile(scan_file), "point cloud file {} is found".format(
+                    scan_file
+                )
 
-            # Sort ascending order
-            non_negatives = np.sort(non_negatives)
+                # Sort ascending order
+                non_negatives = np.sort(non_negatives)
 
-            self.queries_id.append(anchor_ndx)
-            self.queries_pc_file.append(scan_filename)
-            # self.queries_positives.append(positives)
-            self.queries_nonnegatives.append(non_negatives)
+                self.queries_id.append(anchor_ndx)
+                self.queries_pc_file.append(scan_filename)
+                self.queries_nonnegatives.append(non_negatives)
+
+            self.query_lengths[scene] = count
 
         print(f"==> Queries: {len(self.queries_nonnegatives)} valid queries")
 
     def construct_database(self, df_db):
         self.database_id = []
         self.database_pc_file = []
+        self.database_lengths = {}
 
-        for idx in range(len(df_db)):
-            self.database_id.append(idx)
-            scan_filename = df_db[idx]["file"]
-            self.database_pc_file.append(scan_filename)
+        for scene in df_db.keys():
+            self.database_lengths[scene] = len(df_db[scene])
+            for idx in range(len(df_db[scene])):
+                scan_filename = df_db[scene][idx]["file"]
+                self.database_id.append(idx)
+                self.database_pc_file.append(scan_filename)
 
         print(f"==> Database: {len(self.database_pc_file)} references")
 
